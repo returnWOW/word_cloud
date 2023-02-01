@@ -485,6 +485,7 @@ class WordCloud(object):
                                     for word, freq in frequencies_org])
 
         # start drawing grey image
+        word_index = 0
         for word, freq in frequencies:
             if freq == 0:
                 continue
@@ -498,9 +499,15 @@ class WordCloud(object):
             else:
                 orientation = Image.ROTATE_90
             tried_other_orientation = False
+            if isinstance(self.font_path, list):
+                font_path = self.font_path[word_index % len(self.font_path)]
+            else:
+                font_path = self.font_path
+            word_index += 1
+
             while True:
                 # try to find a position
-                font = ImageFont.truetype(self.font_path, font_size)
+                font = ImageFont.truetype(font_path, font_size)
                 # transpose font optionally
                 transposed_font = ImageFont.TransposedFont(
                     font, orientation=orientation)
@@ -537,7 +544,7 @@ class WordCloud(object):
                                           position=(x, y),
                                           orientation=orientation,
                                           random_state=random_state,
-                                          font_path=self.font_path))
+                                          font_path=font_path))
             # recompute integral image
             if self.mask is None:
                 img_array = np.asarray(img_grey)
@@ -656,8 +663,15 @@ class WordCloud(object):
                                     int(height * self.scale)),
                         self.background_color)
         draw = ImageDraw.Draw(img)
+        word_index = 0
         for (word, count), font_size, position, orientation, color in self.layout_:
-            font = ImageFont.truetype(self.font_path,
+            if isinstance(self.font_path, list):
+                font_path = self.font_path[word_index % len(self.font_path)]
+            else:
+                font_path = self.font_path
+            word_index += 1
+
+            font = ImageFont.truetype(font_path,
                                       int(font_size * self.scale))
             transposed_font = ImageFont.TransposedFont(
                 font, orientation=orientation)
